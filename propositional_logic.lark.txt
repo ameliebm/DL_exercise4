@@ -1,0 +1,15 @@
+start: expr
+
+expr: term
+    | expr "or" term
+
+term: factor
+    | term "and" factor
+
+factor: "not" factor
+    | "(" expr ")"
+    | VAR
+
+VAR: /[a-z]/
+
+%ignore /\s+/
