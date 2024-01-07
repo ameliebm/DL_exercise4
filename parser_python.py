@@ -1,8 +1,24 @@
-from lark import Lark, Transformer
+from lark import Lark, Transformer, tree
 
-# Load the grammar from the file
-with open("propositional_logic.lark.txt", "r") as f:
-    grammar = f.read()
+
+# Load the grammar
+grammar = r"""
+    start: disjunction
+
+    disjunction: conjunction
+        | disjunction "or" conjunction
+
+    conjunction: atom
+        | conjunction "and" atom
+
+    atom: "not" atom
+        | "(" disjunction ")"
+        | VAR
+
+    VAR: /[a-z]/
+
+    %ignore /\s+/
+"""
 
 
 
@@ -21,13 +37,20 @@ class PropositionalLogicTransformer(Transformer):
         return ('OR', tokens[0], tokens[1])
     
 # Test the parser
-formula = "(p and q) or not r"
+formula = "(p or q)"
 # Create the Lark parser
-parser = Lark(grammar, start='expr')
+parser = Lark(grammar, start='disjunction')
 parsed_tree = parser.parse(formula)
-print(parsed_tree)
-print(parsed_tree.pretty())
-lark.tree.pydot__tree_to_png()
+#print(parsed_tree)
+#print(parsed_tree.pretty())
+
+#transformer = PropositionalLogicTransformer()
+#parsed_formula = transformer.transform(parsed_tree)
+
+# Visualize and save the parse tree as a PNG image
+tree_png = tree.pydot__tree_to_png(parsed_tree, "parse_tree.png")
+
+#lark.tree.pydot__tree_to_png()
 #transformer = PropositionalLogicTransformer()
 #parsed_formula = transformer.transform(parsed_tree)
 #print(parsed_formula)
